@@ -1,0 +1,30 @@
+This is a simple combination of a small C module for apache and another one in Perl for mod_perl
+
+In lots of cases , you end up with a lightweight docserver in front of a heavyweight mod_perl enabled
+server.  This is a good thing for speed and performance (see http://perl.apache.org/guide).
+
+The problem this combination tries to solve is that the mod_perl server doesn't know anything about
+the client connection, since it's only talking to a doc server.
+
+Install the C module in the doc server like so
+
+cd apache-src
+./configure --with-plenty-of-options -add-module=/path/to/mod_proxy_add_info.c
+
+And you just need to put the Perl module in the mod_perl server
+perl Makefile.PL
+make && make test && make install
+
+And in httpd.conf
+PerlModule Apache::Proxy::Info
+PerlTransHandler Apache::Proxy::Info;
+
+Currently 3 pieces of information are passed thru
+
+$r->connection->remote_ip()
+$ENV{'HTTPS'}
+$r->header_in('Host');
+
+
+Enjoy!
+
